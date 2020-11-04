@@ -57,11 +57,6 @@ TLDList *tldlist_create( Date *begin,  Date *end){
 
 }
 
-void tldlist_destroy(TLDList *tld){
-
-    free(tld);
-
-}
 int get_height(TLDNode *n){
 
     if(n == NULL){
@@ -436,7 +431,7 @@ TLDNode *tldlist_iter_next(TLDIterator *iter) {
 
 void tldlist_iter_destroy(TLDIterator *iter){
 
-
+    free(iter->ptrs);
     free(iter);
 
 }
@@ -450,6 +445,27 @@ char *tldnode_tldname(TLDNode *node){
 long tldnode_count(TLDNode *node){
 
     return node->TLDcount;
+
+}
+
+void tldnode_destroy(TLDNode *n){
+
+    freen(n);
+
+}
+
+void tldlist_destroy(TLDList *tld){
+
+    struct TLDIterator *it;
+    struct TLDNode *n;
+
+    it = tldlist_iter_create(tld);
+    while ((n = tldlist_iter_next(it))) {
+        tldnode_destroy(n);
+    }
+
+    free(it);
+    free(tld);
 
 }
 
