@@ -396,6 +396,7 @@ TLDIterator *tldlist_iter_create(TLDList *tld){
         p->ptrs = (struct tldnode*)malloc(tld->TLDSize * sizeof(struct tldnode*));
         p->next_node = 0;
         p->max_node = tld->TLDSize;
+        printf("Nodes to find = %d", tld->TLDSize);
 
         tlditer_node_finder(p, tld->root);
         printf("Nodes found = %d", p->next_node);
