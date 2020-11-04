@@ -461,7 +461,13 @@ void tldlist_destroy(TLDList *tld){
 
     it = tldlist_iter_create(tld);
     while ((n = tldlist_iter_next(it))) {
-        tldnode_destroy(n);
+
+        if(n != NULL){
+
+            tldnode_destroy(n);
+
+        }
+
     }
 
     free(it);
