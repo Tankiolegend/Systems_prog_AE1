@@ -431,7 +431,7 @@ TLDNode *tldlist_iter_next(TLDIterator *iter) {
 
 void tldlist_iter_destroy(TLDIterator *iter){
 
-    free(iter->ptrs);
+    //free(iter->ptrs);
     free(iter);
 
 }
