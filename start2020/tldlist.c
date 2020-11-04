@@ -12,7 +12,7 @@ struct tldlist {
     struct date  *end_date;
     long add_success;
     struct tldnode *root;
-    int TLDSize;
+    long TLDSize;
 
 };
 
@@ -321,7 +321,7 @@ int tldlist_add(TLDList *tld, char *hostname, Date *d){
 
                     p->TLDcount += 1;
                     tld->add_success +=1;
-                    printf("%d \n", tld->add_success);
+                    printf("%ld \n", tld->add_success);
                     search_add = true;
 
                     return 1;
