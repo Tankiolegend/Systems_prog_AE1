@@ -321,7 +321,9 @@ int tldlist_add(TLDList *tld, char *hostname, Date *d){
 
                     p->TLDcount += 1;
                     tld->add_success +=1;
+                    printf("%d \n", tld->add_success);
                     search_add = true;
+
                     return 1;
 
                 }else if(strcmp(ptr, p->TLDstr) > 0){
@@ -431,7 +433,6 @@ TLDNode *tldlist_iter_next(TLDIterator *iter) {
 
 void tldlist_iter_destroy(TLDIterator *iter){
 
-    //free(iter->ptrs);
     free(iter);
 
 }
@@ -456,21 +457,6 @@ void tldnode_destroy(TLDNode *n){
 
 void tldlist_destroy(TLDList *tld){
 
-    /*struct tlditerator *it;
-    struct tldnode *n;
-
-    t = tldlist_iter_create(tld);
-    while ((n = tldlist_iter_next(it))) {
-
-        if(n != NULL){
-
-            tldnode_destroy(n);
-
-        }
-
-    }
-
-    free(it);*/
     free(tld);
 
 }
