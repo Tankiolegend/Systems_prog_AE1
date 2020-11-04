@@ -278,6 +278,8 @@ TLDIterator *tldlist_iter_create(TLDList *tld){
 
 int tldlist_add(TLDList *tld, char *hostname, Date *d){
 
+    TLDIterator *it = NULL;
+    TLDNode *n;
     char delim[] = ".";
     char *ptr = strtok(hostname, delim);
     char *ptr2 = strtok(NULL, delim);
