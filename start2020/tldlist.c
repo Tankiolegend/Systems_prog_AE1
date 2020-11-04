@@ -456,10 +456,10 @@ void tldnode_destroy(TLDNode *n){
 
 void tldlist_destroy(TLDList *tld){
 
-    struct tlditerator *it;
+    /*struct tlditerator *it;
     struct tldnode *n;
 
-    it = tldlist_iter_create(tld);
+    t = tldlist_iter_create(tld);
     while ((n = tldlist_iter_next(it))) {
 
         if(n != NULL){
@@ -470,7 +470,7 @@ void tldlist_destroy(TLDList *tld){
 
     }
 
-    free(it);
+    free(it);*/
     free(tld);
 
 }
