@@ -450,14 +450,14 @@ long tldnode_count(TLDNode *node){
 
 void tldnode_destroy(TLDNode *n){
 
-    freen(n);
+    free(n);
 
 }
 
 void tldlist_destroy(TLDList *tld){
 
-    struct TLDIterator *it;
-    struct TLDNode *n;
+    struct tlditerator *it;
+    struct tldnode *n;
 
     it = tldlist_iter_create(tld);
     while ((n = tldlist_iter_next(it))) {
