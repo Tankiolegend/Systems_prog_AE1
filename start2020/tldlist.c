@@ -236,7 +236,6 @@ void tlditer_node_finder(TLDIterator *iter, TLDNode *n){
 
     iter->ptrs[iter->next_node] = *n;
     iter->next_node +=1;
-    printf("Node found!");
 
     if(n->right != NULL){
 
@@ -260,10 +259,8 @@ TLDIterator *tldlist_iter_create(TLDList *tld){
         p->ptrs = (struct tldnode*)malloc(tld->TLDSize * sizeof(struct tldnode*));
         p->next_node = 0;
         p->max_node = tld->TLDSize;
-        printf("Nodes to find = %d", tld->TLDSize);
 
         tlditer_node_finder(p, tld->root);
-        printf("Nodes found = %d", p->next_node);
         p->next_node = 0;
 
         return p;
@@ -278,8 +275,6 @@ TLDIterator *tldlist_iter_create(TLDList *tld){
 
 int tldlist_add(TLDList *tld, char *hostname, Date *d){
 
-    TLDIterator *it = NULL;
-    TLDNode *n;
     char delim[] = ".";
     char *ptr = strtok(hostname, delim);
     char *ptr2 = strtok(NULL, delim);
@@ -346,15 +341,10 @@ int tldlist_add(TLDList *tld, char *hostname, Date *d){
                             q->left = NULL;
                             q->right = NULL;
                             q->height = 0;
+                            p->right = q;
                             rebalance(tld, p);
                             tld->add_success +=1;
                             tld->TLDSize+=1;
-
-                            it = tldlist_iter_create(tld);
-                            printf("added new node \n");
-                            while ((n = tldlist_iter_next(it))) {
-                                printf("%6.2f %s\n", 100.0 * (double)tldnode_count(n)/tld->add_success, tldnode_tldname(n));
-                            }
 
                             search_add = true;
                             return 1;
@@ -385,16 +375,10 @@ int tldlist_add(TLDList *tld, char *hostname, Date *d){
                             q->left = NULL;
                             q->right = NULL;
                             q->height = 0;
+                            p->left = q;
                             rebalance(tld, p);
                             tld->add_success +=1;
                             tld->TLDSize+=1;
-
-                            it = tldlist_iter_create(tld);
-                            printf("added new node \n");
-                            while ((n = tldlist_iter_next(it))) {
-                                printf("%6.2f %s\n", 100.0 * (double)tldnode_count(n)/tld->add_success, tldnode_tldname(n));
-                            }
-
                             search_add = true;
                             return 1;
 
