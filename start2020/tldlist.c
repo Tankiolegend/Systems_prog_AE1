@@ -303,6 +303,13 @@ int tldlist_add(TLDList *tld, char *hostname, Date *d){
                             rebalance(tld, p);
                             tld->add_success +=1;
                             tld->TLDSize+=1;
+
+                            it = tldlist_iter_create(tld);
+                            printf("added new node \n");
+                            while ((n = tldlist_iter_next(it))) {
+                                printf("%6.2f %s\n", 100.0 * (double)tldnode_count(n)/tld->add_success, tldnode_tldname(n));
+                            }
+
                             search_add = true;
                             return 1;
 
@@ -335,6 +342,13 @@ int tldlist_add(TLDList *tld, char *hostname, Date *d){
                             rebalance(tld, p);
                             tld->add_success +=1;
                             tld->TLDSize+=1;
+
+                            it = tldlist_iter_create(tld);
+                            printf("added new node \n");
+                            while ((n = tldlist_iter_next(it))) {
+                                printf("%6.2f %s\n", 100.0 * (double)tldnode_count(n)/tld->add_success, tldnode_tldname(n));
+                            }
+
                             search_add = true;
                             return 1;
 
