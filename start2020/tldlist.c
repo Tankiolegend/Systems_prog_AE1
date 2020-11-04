@@ -232,6 +232,50 @@ void rebalance(TLDList *tld, TLDNode *n){
 }
 
 
+void tlditer_node_finder(TLDIterator *iter, TLDNode *n){
+
+    iter->ptrs[iter->next_node] = *n;
+    iter->next_node +=1;
+    printf("Node found!");
+
+    if(n->right != NULL){
+
+        tlditer_node_finder(iter, n->right);
+
+    }
+    if(n->left != NULL){
+
+        tlditer_node_finder(iter, n->left);
+
+    }
+
+}
+
+TLDIterator *tldlist_iter_create(TLDList *tld){
+
+    struct tlditerator *p;
+
+    if ((p = (struct tlditerator *) malloc(sizeof(struct tlditerator))) != NULL) {
+
+        p->ptrs = (struct tldnode*)malloc(tld->TLDSize * sizeof(struct tldnode*));
+        p->next_node = 0;
+        p->max_node = tld->TLDSize;
+        printf("Nodes to find = %d", tld->TLDSize);
+
+        tlditer_node_finder(p, tld->root);
+        printf("Nodes found = %d", p->next_node);
+        p->next_node = 0;
+
+        return p;
+
+    }else{
+
+        return NULL;
+
+    }
+
+}
+
 int tldlist_add(TLDList *tld, char *hostname, Date *d){
 
     char delim[] = ".";
@@ -382,49 +426,8 @@ long tldlist_count(TLDList *tld){
 
 }
 
-void tlditer_node_finder(TLDIterator *iter, TLDNode *n){
 
-    iter->ptrs[iter->next_node] = *n;
-    iter->next_node +=1;
-    printf("Node found!");
 
-    if(n->right != NULL){
-
-        tlditer_node_finder(iter, n->right);
-
-    }
-    if(n->left != NULL){
-
-        tlditer_node_finder(iter, n->left);
-
-    }
-
-}
-
-TLDIterator *tldlist_iter_create(TLDList *tld){
-
-    struct tlditerator *p;
-
-    if ((p = (struct tlditerator *) malloc(sizeof(struct tlditerator))) != NULL) {
-
-        p->ptrs = (struct tldnode*)malloc(tld->TLDSize * sizeof(struct tldnode*));
-        p->next_node = 0;
-        p->max_node = tld->TLDSize;
-        printf("Nodes to find = %d", tld->TLDSize);
-
-        tlditer_node_finder(p, tld->root);
-        printf("Nodes found = %d", p->next_node);
-        p->next_node = 0;
-
-        return p;
-
-    }else{
-
-        return NULL;
-
-    }
-
-}
 
 TLDNode *tldlist_iter_next(TLDIterator *iter) {
 
