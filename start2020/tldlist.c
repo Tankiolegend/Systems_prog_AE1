@@ -288,7 +288,7 @@ int tldlist_add(TLDList *tld, char *hostname, Date *d){
                     search_add = true;
                     return 1;
 
-                }else if(strcmp(ptr, p->TLDstr) < 0){
+                }else if(strcmp(ptr, p->TLDstr) > 0){
 
                     if(p->right == NULL){
 
@@ -296,7 +296,7 @@ int tldlist_add(TLDList *tld, char *hostname, Date *d){
 
                             q->parent = p;
                             q->TLDcount = 1;
-                            strcpy(p->TLDstr, ptr);
+                            strcpy(q->TLDstr, ptr);
                             q->left = NULL;
                             q->right = NULL;
                             q->height = 0;
@@ -328,7 +328,7 @@ int tldlist_add(TLDList *tld, char *hostname, Date *d){
 
                             q->parent = p;
                             q->TLDcount = 1;
-                            strcpy(p->TLDstr, ptr);
+                            strcpy(q->TLDstr, ptr);
                             q->left = NULL;
                             q->right = NULL;
                             q->height = 0;
