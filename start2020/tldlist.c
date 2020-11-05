@@ -6,6 +6,7 @@
 //
 // Created by James Ross on 29/10/2020.
 //
+//Initialise Structs
 struct tldlist {
 
     struct date *begin_date;
@@ -36,11 +37,12 @@ struct tlditerator {
 };
 
 
-
+//Creates an instance of tld list
 TLDList *tldlist_create( Date *begin,  Date *end){
 
     struct tldlist *p;
 
+    //Gets new address memory for list if possible, if yes initialize list
     if ((p = (struct tldlist *)malloc(sizeof(struct tldlist))) != NULL){
 
         p->begin_date = begin;
@@ -55,6 +57,7 @@ TLDList *tldlist_create( Date *begin,  Date *end){
 
 }
 
+//Gets the height of the current node, used for avl
 int get_height(TLDNode *n){
 
     if(n == NULL){
@@ -67,6 +70,7 @@ int get_height(TLDNode *n){
 
 }
 
+//Updates a nodes height when rebalancing for avl
 void reheight(TLDNode *n){
 
     if(n != NULL){
@@ -86,6 +90,7 @@ void reheight(TLDNode *n){
 
 }
 
+//Sets a nodes balance value to be used for balancing avl
 void setBalance(TLDNode *n){
 
     reheight(n);
@@ -94,7 +99,7 @@ void setBalance(TLDNode *n){
 
 }
 
-
+//Rotates node to the left to rebalance the tree
 TLDNode* rotateLeft(TLDNode *a){
 
     struct tldnode *b = a->right;
@@ -131,6 +136,7 @@ TLDNode* rotateLeft(TLDNode *a){
 
 }
 
+//Rotates node to the right to rebalance the tree
 TLDNode* rotateRight(TLDNode *a){
 
     struct tldnode *b = a->left;
@@ -166,6 +172,7 @@ TLDNode* rotateRight(TLDNode *a){
     return b;
 }
 
+//Rotates node to the left to rebalance the tree and then calls to rotate it right for rebalancing
 TLDNode* rotateLeftThenRight(TLDNode *n){
 
     n->left = rotateLeft(n->left);
@@ -174,6 +181,7 @@ TLDNode* rotateLeftThenRight(TLDNode *n){
 
 }
 
+//Rotates node to the right to rebalance the tree and then calls to rotate it left for rebalancing
 TLDNode* rotateRightThenLeft(TLDNode *n){
 
     n->right = rotateRight(n->right);
@@ -182,6 +190,8 @@ TLDNode* rotateRightThenLeft(TLDNode *n){
 
 }
 
+//Function to rebalance the avl tree, determines what nodes need to be rotated in which direction based upon their
+//balance value
 void rebalance(TLDList *tld, TLDNode *n){
 
     setBalance(n);
@@ -211,6 +221,7 @@ void rebalance(TLDList *tld, TLDNode *n){
 
     }
 
+    //Checks if balanced node is now the root if so updates the root, if not rebalances the parent node
     if (n->parent != NULL){
 
         rebalance(tld, n->parent);
@@ -224,7 +235,8 @@ void rebalance(TLDList *tld, TLDNode *n){
 
 }
 
-
+//Used for once the itertaor is done with iterating through nodes returning their found variables back to false to
+// allow them to be iterated again
 void tlditer_node_unfinder(TLDNode *n){
 
     n->found = false;
@@ -242,10 +254,12 @@ void tlditer_node_unfinder(TLDNode *n){
 
 }
 
+// CReates an instance of the iterator
 TLDIterator *tldlist_iter_create(TLDList *tld){
 
     struct tlditerator *p;
 
+    //Gets memory for the iterator if so initialises it
     if ((p = (struct tlditerator *) malloc(sizeof(struct tlditerator))) != NULL) {
 
         p->root = tld->root;
@@ -260,14 +274,18 @@ TLDIterator *tldlist_iter_create(TLDList *tld){
 
 }
 
+//Function that adds new nodes to the avl tree
+
 int tldlist_add(TLDList *tld, char *hostname, Date *d){
 
+    //Initiliaze variables for function to use
     char delim[] = ".";
     char *ptr = strtok(hostname, delim);
     char *ptr2 = strtok(NULL, delim);
     bool search_add = false;
     bool search_add_success = false;
 
+    //loops through the hostname to get the ending tld
     while(ptr2 != NULL){
 
         ptr = ptr2;
@@ -276,10 +294,12 @@ int tldlist_add(TLDList *tld, char *hostname, Date *d){
 
     }
 
+    //Checks if the given data is within the search dates
     if((date_compare(tld->begin_date, d)<1) && ((date_compare(tld->end_date, d)>-1))){
 
         struct tldnode *p;
 
+        //checks if there is a tree root, if no create a new node and initialise it as the root
         if(tld->root == NULL){
 
             if ((p = (struct tldnode *)malloc(sizeof(struct tldnode))) != NULL) {
@@ -299,6 +319,7 @@ int tldlist_add(TLDList *tld, char *hostname, Date *d){
 
             }else{
 
+                //if node creation fails need to exit while loop to ensure we don't loop forever
                 search_add = true;
 
             }
@@ -311,6 +332,7 @@ int tldlist_add(TLDList *tld, char *hostname, Date *d){
 
             while (search_add == false){
 
+                //If provided tld is in the avl update the node by increasing the count
                 if(strcmp(ptr, p->TLDstr) == 0){
 
                     p->TLDcount += 1;
@@ -318,10 +340,12 @@ int tldlist_add(TLDList *tld, char *hostname, Date *d){
                     search_add_success = true;
                     search_add = true;
 
+                //Determine if need to go left or right in avl tree
                 }else if(strcmp(ptr, p->TLDstr) > 0){
 
                     if(p->right == NULL){
 
+                        //create new node if it doesn't exist, if new node successful initialise it
                         if ((q = (struct tldnode *)malloc(sizeof(struct tldnode))) != NULL){
 
                             q->parent = p;
@@ -340,6 +364,7 @@ int tldlist_add(TLDList *tld, char *hostname, Date *d){
 
                         }else{
 
+                            //if node creation fails need to exit while loop to ensure we don't loop forever
                             search_add = true;
 
 
@@ -356,6 +381,7 @@ int tldlist_add(TLDList *tld, char *hostname, Date *d){
 
                     if (p->left == NULL) {
 
+                        //create new node if it doesn't exist, if new node successful initialise it
                         if ((q = (struct tldnode *) malloc(sizeof(struct tldnode))) != NULL) {
 
                             q->parent = p;
@@ -374,6 +400,7 @@ int tldlist_add(TLDList *tld, char *hostname, Date *d){
 
                         } else {
 
+                            //if node creati0n fails need to exit while loop to ensure we don't loop forever
                             search_add= true;
 
                         }
@@ -392,6 +419,7 @@ int tldlist_add(TLDList *tld, char *hostname, Date *d){
 
     }
 
+    //return 1 if node was successfully updated/created
     if(search_add_success == true){
 
         return 1;
@@ -402,12 +430,14 @@ int tldlist_add(TLDList *tld, char *hostname, Date *d){
 
 }
 
+//returns the count of how many times tld's were successfully added to their nodes in avl tree
 long tldlist_count(TLDList *tld){
 
     return tld->add_success;
 
 }
 
+//Used to get the next unvisited node returns null if none are found
 TLDNode *tld_node_find(TLDNode *n){
 
     if(n->found == false){
@@ -433,7 +463,8 @@ TLDNode *tld_node_find(TLDNode *n){
 
 }
 
-
+//Gets the next unfound node, if none found returns NULL, makes use of tld_node_find
+//If all nodes been find resets the nodes to be unfound
 TLDNode *tldlist_iter_next(TLDIterator *iter) {
 
     struct tldnode *p;
@@ -451,30 +482,36 @@ TLDNode *tldlist_iter_next(TLDIterator *iter) {
 
 }
 
+//frees the malloc'd memory for the iterator
 void tldlist_iter_destroy(TLDIterator *iter){
 
     free(iter);
 
 }
 
+//returns the tld name from the node that repreents it
 char *tldnode_tldname(TLDNode *node){
 
     return node->TLDstr;
 
 }
 
+//returns the count of tld visits on that node
 long tldnode_count(TLDNode *node){
 
     return node->TLDcount;
 
 }
 
+//Frees the memory the node takes up
 void tldnode_destroy(TLDNode *n){
 
     free(n);
 
 }
 
+//frees the memory tldlist uses, to do so it creates an iterator and iterates over the nodes freeing them,
+//upon completion frees the iterator and then frees the tldlists
 void tldlist_destroy(TLDList *tld){
 
     struct tlditerator *iter;
