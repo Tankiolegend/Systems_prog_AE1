@@ -6,7 +6,7 @@
 // Created by James Ross on 29/10/2020.
 //
 
-
+//Defines structs
 struct date{
 
     int day;
@@ -15,7 +15,9 @@ struct date{
 
 };
 
+//Creates an instance of the date struct
 Date *date_create(char *datestr){
+
     struct date *p;
 
     char delim[] = "/";
@@ -24,6 +26,7 @@ Date *date_create(char *datestr){
 
     char *ptr = strtok(datevalue, delim);
 
+    //Allocates memory for the date struct, if successful initialise values
     if ((p = (struct date *)malloc(sizeof(struct date))) != NULL){
 
         p->day = atoi(ptr);
@@ -34,13 +37,13 @@ Date *date_create(char *datestr){
         ptr = strtok(NULL, delim);
         p->year = atoi(ptr);
 
-
     }
 
     return p;
 
 }
 
+//Duplicates a given date
 Date *date_duplicate(Date *d){
 
     struct date *p;
@@ -57,6 +60,7 @@ Date *date_duplicate(Date *d){
 
 }
 
+//Compares two dates to ee which is more recent
 int date_compare(Date *date1, Date *date2){
 
     if(date1->year == date2->year){
@@ -100,6 +104,7 @@ int date_compare(Date *date1, Date *date2){
 
 }
 
+//Frees the memory allocated to a date
 void date_destroy(Date *d){
 
     free(d);

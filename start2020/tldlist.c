@@ -45,8 +45,8 @@ TLDList *tldlist_create( Date *begin,  Date *end){
     //Gets new address memory for list if possible, if yes initialize list
     if ((p = (struct tldlist *)malloc(sizeof(struct tldlist))) != NULL){
 
-        p->begin_date = begin;
-        p->end_date = end;
+        p->begin_date = date_duplicate(begin);
+        p->end_date = date_duplicate(end);
         p->root = NULL;
         p->TLDSize = 0;
         p->add_success = 0;
@@ -524,6 +524,8 @@ void tldlist_destroy(TLDList *tld){
     }
 
     tldlist_iter_destroy(iter);
+    date_destroy(tld->end_date);
+    date_destroy(tld->begin_date);
 
     free(tld);
 
