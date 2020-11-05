@@ -25,15 +25,13 @@ struct tldnode {
     struct tldnode *right;
     int balance;
     int height;
+    bool found;
 
 };
 
 struct tlditerator {
 
-    struct tldnode *ptrs;
-    int next_node;
-    long max_node;
-
+    struct tldnode *root;
 
 };
 
@@ -227,19 +225,18 @@ void rebalance(TLDList *tld, TLDNode *n){
 }
 
 
-void tlditer_node_finder(TLDIterator *iter, TLDNode *n){
+void tlditer_node_unfinder(TLDNode *n){
 
-    iter->ptrs[iter->next_node] = *n;
-    iter->next_node +=1;
+    n->found = false;
 
     if(n->right != NULL){
 
-        tlditer_node_finder(iter, n->right);
+        tlditer_node_unfinder(n->right);
 
     }
     if(n->left != NULL){
 
-        tlditer_node_finder(iter, n->left);
+        tlditer_node_unfinder(n->left);
 
     }
 
@@ -251,12 +248,7 @@ TLDIterator *tldlist_iter_create(TLDList *tld){
 
     if ((p = (struct tlditerator *) malloc(sizeof(struct tlditerator))) != NULL) {
 
-        p->ptrs = (struct tldnode*)malloc(tld->TLDSize * sizeof(struct tldnode*));
-        p->next_node = 0;
-        p->max_node = tld->TLDSize;
-
-        tlditer_node_finder(p, tld->root);
-        p->next_node = 0;
+        p->root = tld->root;
 
         return p;
 
@@ -273,6 +265,8 @@ int tldlist_add(TLDList *tld, char *hostname, Date *d){
     char delim[] = ".";
     char *ptr = strtok(hostname, delim);
     char *ptr2 = strtok(NULL, delim);
+    bool search_add = false;
+    bool search_add_success = false;
 
     while(ptr2 != NULL){
 
@@ -296,20 +290,20 @@ int tldlist_add(TLDList *tld, char *hostname, Date *d){
                 p->left = NULL;
                 p->right = NULL;
                 p->height= 0;
+                p->found = false;
                 tld->root = p;
                 tld->add_success +=1;
                 tld->TLDSize+=1;
-                return 1;
+                search_add_success = true;
+                search_add = true;
 
             }else{
 
-                return 0;
+                search_add = true;
 
             }
 
         }else{
-
-            bool search_add = false;
 
             p = tld->root;
 
@@ -321,10 +315,8 @@ int tldlist_add(TLDList *tld, char *hostname, Date *d){
 
                     p->TLDcount += 1;
                     tld->add_success +=1;
-                    printf("%ld \n", tld->add_success);
+                    search_add_success = true;
                     search_add = true;
-
-                    return 1;
 
                 }else if(strcmp(ptr, p->TLDstr) > 0){
 
@@ -338,17 +330,17 @@ int tldlist_add(TLDList *tld, char *hostname, Date *d){
                             q->left = NULL;
                             q->right = NULL;
                             q->height = 0;
+                            q->found = false;
                             p->right = q;
                             rebalance(tld, p);
                             tld->add_success +=1;
                             tld->TLDSize+=1;
-
+                            search_add_success = true;
                             search_add = true;
-                            return 1;
 
                         }else{
 
-                            return 0;
+                            search_add = true;
 
 
                         }
@@ -372,16 +364,17 @@ int tldlist_add(TLDList *tld, char *hostname, Date *d){
                             q->left = NULL;
                             q->right = NULL;
                             q->height = 0;
+                            q->found = false;
                             p->left = q;
                             rebalance(tld, p);
                             tld->add_success +=1;
                             tld->TLDSize+=1;
+                            search_add_success = true;
                             search_add = true;
-                            return 1;
 
                         } else {
 
-                            return 0;
+                            search_add= true;
 
                         }
 
@@ -399,6 +392,12 @@ int tldlist_add(TLDList *tld, char *hostname, Date *d){
 
     }
 
+    if(search_add_success == true){
+
+        return 1;
+
+    }
+
     return 0;
 
 }
@@ -409,21 +408,42 @@ long tldlist_count(TLDList *tld){
 
 }
 
+TLDNode *tld_node_find(TLDNode *n){
 
+    if(n->found == false){
+
+        if(n->right != NULL && n->right->found != true){
+
+            return tld_node_find(n->right);
+
+        }else if(n->left != NULL && n->left->found != true){
+
+            return tld_node_find(n->left);
+
+        }else{
+
+            n->found = true;
+            return n;
+
+        }
+
+    }
+
+    return NULL;
+
+}
 
 
 TLDNode *tldlist_iter_next(TLDIterator *iter) {
 
     struct tldnode *p;
+    p = iter->root;
 
-    if (iter->next_node < iter->max_node) {
+    p = tld_node_find(p);
 
-        p = &iter->ptrs[iter->next_node];
+    if(p == NULL){
 
-        iter->next_node += 1;
-    }else{
-
-        p = NULL;
+        tlditer_node_unfinder(iter->root);
 
     }
 
@@ -456,6 +476,17 @@ void tldnode_destroy(TLDNode *n){
 }
 
 void tldlist_destroy(TLDList *tld){
+
+    struct tlditerator *iter;
+    struct tldnode *n;
+
+    iter = tldlist_iter_create(tld);
+
+    while ((n = tldlist_iter_next(iter))) {
+        free(n);
+    }
+
+    tldlist_iter_destroy(iter);
 
     free(tld);
 
